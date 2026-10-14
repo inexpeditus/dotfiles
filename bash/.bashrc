@@ -21,6 +21,11 @@ for _p in "$HOME/.pi/agent/bin" "$HOME/.local/bin"; do
 done
 unset _p
 export PATH
+
+# .NET SDK (user-level install) and CSharpier, used by nvim format-on-save
+export DOTNET_ROOT="$HOME/.dotnet"
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
+case ":$PATH:" in *":$DOTNET_ROOT/tools:"*) ;; *) PATH="$DOTNET_ROOT:$DOTNET_ROOT/tools:$PATH" ;; esac
 export LIBVIRT_DEFAULT_URI=qemu:///system
 
 # Functions

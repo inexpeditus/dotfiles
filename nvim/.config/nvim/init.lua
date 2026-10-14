@@ -1,11 +1,47 @@
--- Dependencies: black-metal-theme-neovim, suda.vim (bundled in pack/), shfmt, prettier, stylua (optional, format on save)
+-- Dependencies: black-metal-theme-neovim, suda.vim (bundled in pack/), shfmt, prettier, stylua, c_formatter_42, csharpier, ruff, gofmt, taplo (optional, format on save)
+
+-- Formatters by file extension. Each takes the file path and returns a command
+-- that reads the buffer on stdin and writes the result to stdout.
+local function prettier(file)
+  -- The path only selects the parser and the project's .prettierrc.
+  return { "prettier", "--stdin-filepath", file }
+end
+
+-- 42 school norm; pipx install c-formatter-42
+local function norm_42()
+  return { "c_formatter_42" }
+end
 
 local formatters = {
-  sh = { "shfmt", "-i", "2" },
-  bash = { "shfmt", "-i", "2" },
-  markdown = { "prettier", "--parser", "markdown", "--prose-wrap", "preserve" },
-  lua = { "stylua", "--indent-type", "Spaces", "--indent-width", "2", "-" },
+  go = function()
+    return { "gofmt" }
+  end,
+  py = function(file)
+    return { "ruff", "format", "--stdin-filename", file, "-" }
+  end,
+  toml = function()
+    return { "taplo", "format", "-" }
+  end,
+  sh = function()
+    return { "shfmt", "-i", "2" }
+  end,
+  lua = function()
+    return { "stylua", "--indent-type", "Spaces", "--indent-width", "2", "-" }
+  end,
+  c = norm_42,
+  h = norm_42,
+  cs = function(file)
+    return { "csharpier", "format", "--write-stdout", "--stdin-path", vim.fn.fnamemodify(file, ":p") }
+  end,
+  json = prettier,
+  yaml = prettier,
+  js = prettier,
+  ts = prettier,
+  css = prettier,
+  md = prettier,
 }
+formatters.bash = formatters.sh
+formatters.yml = formatters.yaml
 
 vim.opt.winbar = " "
 -- vim.opt.foldcolumn = "1"
@@ -38,12 +74,15 @@ for name, fg in pairs({ StatusLine = "#FA907A", StatusLineNC = "#FA907A" }) do
   vim.api.nvim_set_hl(0, name, hl)
 end
 
+local patterns = vim.tbl_map(function(ext)
+  return "*." .. ext
+end, vim.tbl_keys(formatters))
+
 vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = { "*.sh", "*.bash", "*.md", "*.lua" },
+  pattern = patterns,
   callback = function(args)
-    local ext = vim.fn.fnamemodify(args.file, ":e")
-    local key = (ext == "md") and "markdown" or ext
-    local cmd = formatters[key]
+    local build = formatters[vim.fn.fnamemodify(args.file, ":e")]
+    local cmd = build and build(args.file)
     if not cmd or vim.fn.executable(cmd[1]) == 0 then
       return
     end
