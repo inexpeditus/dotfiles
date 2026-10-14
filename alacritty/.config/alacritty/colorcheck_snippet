@@ -1,0 +1,1 @@
+for i in {0..7}; do printf "\e[3${i}m normal%-2s \e[9${i}m bright%s\e[0m\n" $i $i; done
