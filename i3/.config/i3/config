@@ -157,7 +157,6 @@ assign [class="(?i)firefox"] $ws2
 # assign [class="(?i)chromium"] $ws2
 # assign [class="thunderbird"] $ws4
 # assign [class="code"] workspace $ws4
-assign [class="figma-linux"] workspace $ws5
 assign [class="KeePassXC"] workspace $ws7
 
 # assign [class="Thunar"] $ws3
