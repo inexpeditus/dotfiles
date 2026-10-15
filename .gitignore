@@ -1,0 +1,19 @@
+# Secrets and personal data
+*.kdbx
+notes/
+wireplumber/
+kvm/
+firefox/
+
+# Separate repository checked out inside this one
+libvert-agent-sandbox/
+
+# Local tool state
+.pi/
+.history/
+.cache/
+
+# Editor and package leftovers
+*.orig
+*.bak
+*.pacnew
