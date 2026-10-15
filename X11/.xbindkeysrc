@@ -1,0 +1,9 @@
+# ~/.xbindkeysrc  (started from ~/.xinitrc)
+# Format: "command" then the key on the next line.
+
+# Backlight
+"brightnessctl set +10%"
+  XF86MonBrightnessUp
+
+"brightnessctl set 10%-"
+  XF86MonBrightnessDown
