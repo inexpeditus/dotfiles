@@ -106,7 +106,6 @@ alias gd='git diff'
 alias reflector='sudo reflector --latest 10 --sort rate --save /etc/pacman.d/mirrorlist'
 alias lsfiles='ls -p | grep -v /$'
 alias lsdirs='ls -d */ 2>/dev/null'
-alias figma='prime-run figma-linux'
 alias zap='~/roy/scripts/zip_and_send.sh' # keep unless syncthing once static ip for the openBSD system is resolved
 alias t='~/roy/scripts/time2.sh' # stupid script to avoid basic math in milen - rename
 alias du_simple='du -h --max-depth=1 ./ | sort -hr'
