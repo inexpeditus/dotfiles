@@ -1,0 +1,10 @@
+# Let the NVIDIA GPU power itself off when idle (PCIe runtime D3).
+# The driver leaves power/control at "on", which keeps the card awake forever.
+# Both classes are listed: 0x0302 is the 3D controller found on hybrid laptops,
+# 0x0300 the VGA controller on other setups.
+ACTION=="bind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030200", TEST=="power/control", ATTR{power/control}="auto"
+ACTION=="bind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030000", TEST=="power/control", ATTR{power/control}="auto"
+
+# Restore the default before the driver lets go of the device.
+ACTION=="unbind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030200", TEST=="power/control", ATTR{power/control}="on"
+ACTION=="unbind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030000", TEST=="power/control", ATTR{power/control}="on"
