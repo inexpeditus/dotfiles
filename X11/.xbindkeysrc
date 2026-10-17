@@ -2,8 +2,8 @@
 # Format: "command" then the key on the next line.
 
 # Backlight
-"brightnessctl set +10%"
+"brightnessctl set +5%"
   XF86MonBrightnessUp
 
-"brightnessctl set 10%-"
+"brightnessctl set 5%-"
   XF86MonBrightnessDown
