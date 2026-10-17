@@ -16,3 +16,8 @@ thickness = 0.1
 [colors.primary]
 background = "#000000"
 foreground = "#f9e5b8"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"
