@@ -118,3 +118,4 @@ alias git-totp='oathtool --totp -b "$(cat ~/roy/.totp_keys/.github_inexpeditus)"
 
 # fix aws
 # alias passcode_git="keepassxc-cli clip -t ~/.roy/roys_db.kdbx 'INEXPEDITUS - Github'"
+alias ac=acage
