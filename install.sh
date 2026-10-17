@@ -6,7 +6,7 @@ set -euo pipefail
 
 cd "$(dirname "$(readlink -f "$0")")"
 
-DEFAULT_PACKAGES=(alacritty bash desktop i3 nvim X11)
+DEFAULT_PACKAGES=(alacritty bash desktop flameshot i3 nvim X11)
 
 flags=(-v --no-folding)
 action=(-R)
