@@ -1,0 +1,47 @@
+# Installed by ./install.sh with pacman -Syu --needed. One package per line.
+
+# Desktop
+i3-wm
+i3blocks
+dmenu
+xorg-xinit
+xorg-xrandr
+xorg-xrdb
+xbindkeys
+brightnessctl
+alacritty
+flameshot
+ttf-liberation
+ttf-terminus-nerd
+
+# Editor and formatters
+neovim
+stylua
+shfmt
+prettier
+ruff
+taplo-cli
+go
+
+# Tools
+git
+fzf
+fd
+xclip
+oath-toolkit
+reflector
+stow
+
+# Hardware
+nvidia-prime
+nvidia-utils
+
+# System
+networkmanager
+libpulse
+libvirt
+ufw
+
+# Apps
+firefox
+keepassxc

@@ -17,3 +17,6 @@ libvert-agent-sandbox/
 *.orig
 *.bak
 *.pacnew
+
+# archinstall config, may hold credentials
+user_configuration.json

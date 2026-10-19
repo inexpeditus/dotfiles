@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-# Link the dotfiles into $HOME with GNU Stow.
-# Usage: ./install.sh [-n] [-R] [package...]   (-n: dry run, -R: remove links)
+# Set up a fresh Arch install: switch networking to NetworkManager, install
+# packages.txt, copy etc/ into /etc, then link the dotfiles into $HOME with
+# GNU Stow.
+# Usage: ./install.sh [-l] [-n] [-R] [package...]
+#   -l: link only (skip networking, packages and system files)
+#   -n: dry run of the linking (implies -l)
+#   -R: remove links (implies -l)
 
 set -euo pipefail
 
@@ -10,17 +15,69 @@ DEFAULT_PACKAGES=(alacritty bash desktop flameshot i3 nvim X11)
 
 flags=(-v --no-folding)
 action=(-R)
-while getopts "nR" opt; do
+link_only=false
+while getopts "lnR" opt; do
   case $opt in
-  n) flags+=(-n) ;;
-  R) action=(-D) ;;
+  l) link_only=true ;;
+  n)
+    flags+=(-n)
+    link_only=true
+    ;;
+  R)
+    action=(-D)
+    link_only=true
+    ;;
   *)
-    echo "usage: $0 [-n] [-R] [package...]" >&2
+    echo "usage: $0 [-l] [-n] [-R] [package...]" >&2
     exit 1
     ;;
   esac
 done
 shift $((OPTIND - 1))
+
+setup_network() {
+  echo "==> networking"
+  # Installing NetworkManager needs whatever connection got us online so far
+  # (iwd or systemd-networkd), so switch over only once it is installed.
+  command -v nmcli >/dev/null || sudo pacman -Syu --needed networkmanager
+  sudo systemctl disable --now systemd-networkd.socket systemd-networkd iwd 2>/dev/null || true
+  sudo systemctl enable --now NetworkManager
+
+  if [ "$(nmcli -t -f STATE general)" = connected ]; then
+    echo "already connected"
+    return
+  fi
+
+  nmcli device wifi list --rescan yes || true
+  while true; do
+    read -rp "Wi-Fi network (SSID), empty to skip: " ssid
+    [ -z "$ssid" ] && return
+    nmcli device wifi connect "$ssid" --ask && return
+    echo "could not connect to '$ssid', try again" >&2
+  done
+}
+
+install_packages() {
+  echo "==> packages"
+  # Strip comments and blank lines.
+  mapfile -t pkgs < <(sed 's/#.*//; /^[[:space:]]*$/d' packages.txt)
+  sudo pacman -Syu --needed "${pkgs[@]}"
+}
+
+install_system_files() {
+  echo "==> system files"
+  # Stow only links into $HOME, so files under etc/ are copied into /etc.
+  mapfile -t files < <(cd etc && find . -type f)
+  for f in "${files[@]}"; do
+    sudo install -Dm644 "etc/$f" "/etc/$f"
+  done
+}
+
+if ! $link_only; then
+  setup_network
+  install_packages
+  install_system_files
+fi
 
 packages=("$@")
 [ ${#packages[@]} -eq 0 ] && packages=("${DEFAULT_PACKAGES[@]}")
