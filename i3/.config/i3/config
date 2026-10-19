@@ -4,6 +4,9 @@ gaps inner 4
 gaps outer 2
 set $mod Mod4
 
+# Title bar font. Pango falls back to other fonts for symbols this one lacks.
+font pango:Liberation Mono 10
+
 floating_modifier $mod
 tiling_drag modifier titlebar
 
@@ -13,7 +16,6 @@ bindsym $mod+Return exec alacritty
 bindsym $mod+q kill
 
 # dmenu
-# bindsym $mod+d exec --no-startup-id i3-dmenu-desktop -fn 'monospace-10' 
 bindsym $mod+d exec --no-startup-id i3-dmenu-desktop --dmenu="dmenu -fn 'liberation 12' -i -nb '#f9e5b8' -nf '#222222' -sb '#ef8513' -sf '#222222'"
 # change focus (vim keys: h j k l = left down up right)
 bindsym $mod+h focus left
@@ -125,18 +127,18 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-#Start i3bar to display a workspace bar (plus the system information i3status
-#finds out, if available)
-#for_window [class=".*"] border pixel 2
+# Start i3bar to display a workspace bar (plus the system information i3status
+# finds out, if available)
+# for_window [class=".*"] border pixel 2
 
 # Window border, background, text, and indicator for focused window
-#client.focused              #000000 #000000 #ffffff #2e9ef4 #ef8513 
+# client.focused              #000000 #000000 #ffffff #2e9ef4 #ef8513 
 
 
-client.focused              #FFF5E0 #FFF5E0 #FFF5E0 #FFF5E0 #ef8513 
-client.focused_inactive     #000000 #000000 #000000 #000000 #000000
+client.focused              #000000 #000000 #ef8513 #FFF5E0 #ef8513 
+client.focused_inactive     #000000 #000000 #FFF5E0 #000000 #000000
 # Window border, background, text, and indicator for unfocused windows
-client.unfocused            #000000 #000000 #000000 #000000 #000000
+client.unfocused            #000000 #000000 #FFF5E0 #000000 #000000
 
 # Window border, background, text, and indicator for urgent windows
 client.urgent               #000000 #000000 #000000 #000000 #000000
@@ -148,18 +150,11 @@ client.placeholder          #000000 #000000 #000000 #FFF5E0 #000000
 #client.background      	    #000000 #000000 #000000 #000000 #00000
 
 bindsym $mod+w exec --no-startup-id firefox
-#bindsym $mod+Shift+l exec i3lock -c '#fffff'
 default_border pixel 1
 default_floating_border pixel 1
 hide_edge_borders smart
-# assign [class="Xfce4-terminal"] $ws1
 assign [class="(?i)firefox"] $ws2
-# assign [class="(?i)chromium"] $ws2
-# assign [class="thunderbird"] $ws4
-# assign [class="code"] workspace $ws4
 assign [class="KeePassXC"] workspace $ws7
-
-# assign [class="Thunar"] $ws3
 
 bar {
   status_command i3blocks -c ~/.config/i3/blocks.conf
@@ -191,3 +186,4 @@ bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ to
 
 bindsym Print exec --no-startup-id flameshot gui
 exec_always --no-startup-id xrandr --output eDP1 --mode 1920x1200
+exec_always --no-startup-id ~/.config/i3/scripts/bold-focus.sh
