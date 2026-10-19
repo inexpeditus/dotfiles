@@ -6,7 +6,6 @@ i3blocks
 dmenu
 xorg-xinit
 xorg-xrandr
-xorg-xrdb
 xbindkeys
 brightnessctl
 alacritty
