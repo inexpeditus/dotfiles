@@ -46,3 +46,7 @@ ufw
 # Apps
 firefox
 keepassxc
+
+# Outside pacman, install by hand:
+# pipx install c-formatter-42
+# dotnet tool install -g csharpier  (needs dotnet-sdk)
