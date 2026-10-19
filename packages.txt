@@ -50,3 +50,14 @@ keepassxc
 # Outside pacman, install by hand:
 # pipx install c-formatter-42
 # dotnet tool install -g csharpier  (needs dotnet-sdk)
+
+# ufw is installed but not set up. To turn the firewall on (deny incoming,
+# keep Syncthing reachable, let libvirt guests use DHCP/DNS and the network):
+# sudo ufw default deny incoming
+# sudo ufw default allow outgoing
+# sudo ufw allow syncthing
+# sudo ufw allow in on virbr0
+# sudo ufw route allow in on virbr0
+# sudo ufw route allow out on virbr0
+# sudo systemctl enable --now ufw
+# sudo ufw enable
