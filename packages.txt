@@ -41,6 +41,7 @@ networkmanager
 libpulse
 libvirt
 ufw
+# tlp  # off for now
 
 # Apps
 firefox
