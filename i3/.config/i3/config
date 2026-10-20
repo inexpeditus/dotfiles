@@ -1,7 +1,7 @@
 # Roy i3
 
-gaps inner 4
-gaps outer 2
+gaps inner 1
+gaps outer 1
 set $mod Mod4
 
 # Title bar font. Pango falls back to other fonts for symbols this one lacks.
