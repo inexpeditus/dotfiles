@@ -10,12 +10,17 @@ normal = { family = "Liberation mono", style = "" }
 history = 10000
 
 [cursor]
-style = { shape = "Underline", blinking = "On" }
+style = { shape = "Underline", blinking = "Always" }
 thickness = 0.1
 
 [colors.primary]
 background = "#000000"
 foreground = "#f9e5b8"
+
+# Cursor in the text color, whatever is under it
+[colors.cursor]
+cursor = "#f9e5b8"
+text = "#000000"
 
 [[keyboard.bindings]]
 key = "Return"
