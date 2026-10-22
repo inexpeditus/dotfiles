@@ -119,3 +119,4 @@ alias git-totp='oathtool --totp -b "$(cat ~/roy/.totp_keys/.github_inexpeditus)"
 # fix aws
 # alias passcode_git="keepassxc-cli clip -t ~/.roy/roys_db.kdbx 'INEXPEDITUS - Github'"
 alias ac=acage
+alias bsd-tunnel='ssh -L 8385:127.0.0.1:8384 roy@192.168.1.252'
