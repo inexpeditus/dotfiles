@@ -4,6 +4,7 @@ COLOR_OK="#a4d280"
 COLOR_WARN="#f0a050"
 COLOR_CRIT="#e05050"
 COLOR_DIM="#888888"
+COLOR_ACCENT="#ef8513" # the accent from the i3 config
 
 # level VALUE WARN CRIT
 # Sets LEVEL to 0 (ok), 1 (VALUE > WARN) or 2 (VALUE > CRIT).
@@ -25,4 +26,23 @@ worst_color() {
   1) COLOR=$COLOR_WARN ;;
   *) COLOR=$COLOR_OK ;;
   esac
+}
+
+# human BYTES
+# Prints a short size, with one decimal below 10: 512B, 12K, 1.2M or 340M.
+human() {
+  local b=$1 unit=1073741824 suffix tenths
+  for suffix in G M K; do
+    if ((b >= unit)); then
+      tenths=$((b * 10 / unit))
+      if ((tenths < 100)); then
+        echo "$((tenths / 10)).$((tenths % 10))$suffix"
+      else
+        echo "$((b / unit))$suffix"
+      fi
+      return
+    fi
+    unit=$((unit / 1024))
+  done
+  echo "${b}B"
 }

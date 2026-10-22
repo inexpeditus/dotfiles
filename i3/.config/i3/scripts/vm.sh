@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Running libvirt VMs for i3blocks: name, CPU load and host memory.
+# Running libvirt VMs for i3blocks: name, CPU load and host memory of each.
 #
-# CPU is the delta of cumulative cpu.time between two runs (kept in
-# $XDG_RUNTIME_DIR), averaged over the vCPUs. Memory is the resident set of the
+# CPU is the delta of each VM's cumulative cpu.time between two runs (kept in
+# $XDG_RUNTIME_DIR), averaged over its vCPUs. Memory is the resident set of the
 # QEMU process on the host, so it needs no guest agent.
 # The block is hidden while no matching VM is running.
 
@@ -24,49 +24,49 @@ stats=$(virsh -c "$URI" domstats --list-running --cpu-total --balloon --vcpu 2>/
     END { flush() }
   ')
 
-names=()
-sum_ns=0 sum_rss=0 sum_vcpus=0
+# Previous run: one "name cpu_ns time_ns" line per VM.
+declare -A prev_ns prev_t
+if [[ -r $state ]]; then
+  while read -r name ns t; do
+    prev_ns[$name]=$ns prev_t[$name]=$t
+  done <"$state"
+fi
+
+now=$(date +%s%N)
+full=() short=() saved=()
 while read -r name ns rss vcpus; do
   [[ -n $name ]] || continue
   # shellcheck disable=SC2254 # PATTERN is meant to be a glob
   case $name in $PATTERN) ;; *) continue ;; esac
-  names+=("$name")
-  sum_ns=$((sum_ns + ns))
-  sum_rss=$((sum_rss + rss))
-  sum_vcpus=$((sum_vcpus + vcpus))
+
+  cpu=0
+  if [[ -n ${prev_ns[$name]} ]]; then
+    dt=$((now - prev_t[$name]))
+    if ((dt > 0 && ns >= prev_ns[$name] && vcpus > 0)); then
+      cpu=$(((ns - prev_ns[$name]) * 100 / (dt * vcpus)))
+      ((cpu > 100)) && cpu=100
+    fi
+  fi
+  saved+=("$name $ns $now")
+  full+=("$name $cpu% $(human $((rss * 1024)))")
+  short+=("$name")
 done <<<"$stats"
 
-if ((${#names[@]} == 0)); then
+if ((${#full[@]} == 0)); then
   rm -f "$state"
   echo
   exit 0
 fi
+printf '%s\n' "${saved[@]}" >"$state"
 
-now=$(date +%s%N)
-cpu=0
-if [[ -r $state ]]; then
-  read -r prev_ns prev_t <"$state"
-  dt=$((now - prev_t))
-  if ((dt > 0 && sum_ns >= prev_ns && sum_vcpus > 0)); then
-    cpu=$(((sum_ns - prev_ns) * 100 / (dt * sum_vcpus)))
-    ((cpu > 100)) && cpu=100
-  fi
-fi
-echo "$sum_ns $now" >"$state"
+# join SEPARATOR ITEM...
+join() {
+  local sep=$1 out
+  shift
+  out=$(printf "%s$sep" "$@")
+  echo "${out%"$sep"}"
+}
 
-# KiB to a short human string: 1.2G or 512M.
-if ((sum_rss >= 1048576)); then
-  mem="$((sum_rss * 10 / 1048576 / 10)).$((sum_rss * 10 / 1048576 % 10))G"
-else
-  mem="$((sum_rss / 1024))M"
-fi
-
-if ((${#names[@]} == 1)); then
-  label=${names[0]}
-else
-  label="${#names[@]} VMs"
-fi
-
-echo "${label} ${cpu}% ${mem}"
-echo "${label}"
+join "  " "${full[@]}"
+join ", " "${short[@]}"
 echo "$COLOR_VM"

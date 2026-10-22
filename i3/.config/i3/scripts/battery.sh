@@ -26,6 +26,14 @@ if [[ $state == Discharging ]]; then
   fi
 fi
 
-echo "Battery: ${percent}% (${state,,})"
-echo "${percent}%"
+# ⚡ charging, orange ⚡ draining (the same colour as upload in the wifi block),
+# = on the charger but not charging (full or held).
+case $state in
+Charging) sign="⚡" ;;
+Discharging) sign="<span color='$COLOR_ACCENT'>⚡</span>" ;;
+*) sign="=" ;;
+esac
+
+echo "Battery: ${percent}% ${sign}"
+echo "${percent}%${sign}"
 echo "$COLOR"

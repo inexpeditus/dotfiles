@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
-# Wi-Fi connection name and signal quality for i3blocks.
+# Wi-Fi connection name, signal quality and traffic for i3blocks.
 #
 # Quality comes from /proc/net/wireless (link quality is out of 70); the
-# connection name comes from NetworkManager.
+# connection name comes from NetworkManager. Traffic is the download and upload
+# per second since the previous run, from the interface's byte counters (kept in
+# $XDG_RUNTIME_DIR).
 
 source "$(dirname "$0")/lib.sh"
+
+COLOR_DOWN=$COLOR_OK
+COLOR_UP=$COLOR_ACCENT
 
 # The first two lines of /proc/net/wireless are headers.
 iface= link=
@@ -28,7 +33,23 @@ fi
 
 quality=$((link * 100 / 70))
 
-echo "${name} ${quality}%"
+state="${XDG_RUNTIME_DIR:-/tmp}/i3blocks-wifi"
+stats=/sys/class/net/$iface/statistics
+rx=$(<"$stats/rx_bytes") tx=$(<"$stats/tx_bytes") now=$(date +%s%N)
+down=0 up=0
+if [[ -r $state ]]; then
+  read -r prev_iface prev_rx prev_tx prev_t <"$state"
+  dt=$((now - prev_t))
+  if [[ $prev_iface == "$iface" ]] && ((dt > 0 && rx >= prev_rx && tx >= prev_tx)); then
+    down=$(((rx - prev_rx) * 1000000000 / dt))
+    up=$(((tx - prev_tx) * 1000000000 / dt))
+  fi
+fi
+echo "$iface $rx $tx $now" >"$state"
+
+# The block uses pango markup, so escape the connection name.
+name=${name//&/'&amp;'} name=${name//</'&lt;'} name=${name//>/'&gt;'}
+echo "${name} ${quality}% <span color='$COLOR_DOWN'>↓</span>$(human "$down") <span color='$COLOR_UP'>↑</span>$(human "$up")"
 echo "${quality}%"
 if ((quality >= 60)); then
   echo "#fff2cc"
