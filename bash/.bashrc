@@ -59,6 +59,65 @@ dots() {
     done
 }
 
+# Stupid script to quickly devalue image data before uploads
+# Should add option to keep date for sorting but meh for now
+
+# perl-image-exiftool and libvips
+
+# Certain files:
+# scrub bild.jpg
+# scrub a.jpg b.png c.webp
+#
+# A whole directory, using a wildcard:
+# scrub semester/*                      # everything in the directory
+# scrub semester/*.jpg                  # only JPEGs
+# scrub semester/*.{jpg,png}            # JPEG and PNG
+# scrub semester/**/*.jpg               # JPEGs in subdirectories too
+
+scrub() {
+    local dogs=("Shiba Inu" "Border Collie" "Dachshund" "Golden Retriever" "Pug"
+        "Siberian Husky" "Corgi" "Beagle" "Poodle" "Greyhound" "Samoyed" "Basenji")
+    local f lat lon when ok n=0 max sep=
+    max=$(nproc)
+    ok=$(mktemp)
+    # Pixels, with libvips: one image per CPU thread at a time. The subshell
+    # keeps job notices quiet; vips' stderr is only an openslide module warning.
+    (
+        for f; do
+            ((n++ >= max)) && wait -n
+            (
+                w=$(vipsheader -f width "$f" 2>/dev/null) && h=$(vipsheader -f height "$f" 2>/dev/null) ||
+                    { echo "scrub: can't read '$f'" >&2; exit 1; }
+                # Orientations 5-8 turn the image a quarter, swapping width and height
+                (($(vipsheader -f orientation "$f" 2>/dev/null || echo 1) >= 5)) && read -r w h <<<"$h $w"
+                opts=keep=none
+                case ${f,,} in *.jpg | *.jpeg | *.webp) opts+=,Q=92 ;; esac
+                tmp=$(realpath -m -- "${f%.*}.scrub.${f##*.}")
+                # -e srgb bakes any color profile into the pixels before it is stripped
+		# remove 3px from each dimension
+                if vipsthumbnail "$f" -e srgb -s "$((w - 3))x$((h - 3))!" -o "$tmp[$opts]" 2>/dev/null; then
+                    mv -- "$tmp" "$f" && realpath -- "$f" >>"$ok"
+                else
+                    rm -f -- "$tmp"
+                    echo "scrub: failed on '$f'" >&2
+                fi
+            ) &
+        done
+        wait
+    )
+    # Metadata: one exiftool for all files, since starting Perl is the slow part.
+    while IFS= read -r f; do
+        read -r lat lon < <(awk -v s="$SRANDOM" 'BEGIN { srand(s); printf "%.6f %.6f", rand() * 180 - 90, rand() * 360 - 180 }')
+        # Randomize creation date and make the camera a dog
+        when=$(date -d "@$((SRANDOM % $(date +%s)))" '+%Y:%m:%d %H:%M:%S')
+        printf '%s\n' $sep -Make="${dogs[SRANDOM % ${#dogs[@]}]}" -Model="${dogs[SRANDOM % ${#dogs[@]}]}" \
+            -AllDates="$when" -GPSLatitude="$lat" -GPSLatitudeRef="$lat" \
+            -GPSLongitude="$lon" -GPSLongitudeRef="$lon" "$f"
+        sep=-execute
+    done <"$ok" | exiftool -@ - -common_args -q -overwrite_original
+    rm -f -- "$ok"
+}
+
 extract() {
     [ -f "$1" ] || { echo "extract: '$1' is not a file" >&2; return 1; }
     case "$1" in

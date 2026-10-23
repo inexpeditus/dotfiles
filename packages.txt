@@ -27,6 +27,8 @@ git
 fzf
 fd
 xclip
+libvips
+perl-image-exiftool
 oath-toolkit
 reflector
 stow
