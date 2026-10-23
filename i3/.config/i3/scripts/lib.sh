@@ -46,3 +46,11 @@ human() {
   done
   echo "${b}B"
 }
+
+# escape TEXT
+# Escapes TEXT for blocks with markup=pango.
+escape() {
+  local s=$1
+  s=${s//&/'&amp;'} s=${s//</'&lt;'} s=${s//>/'&gt;'}
+  echo "$s"
+}

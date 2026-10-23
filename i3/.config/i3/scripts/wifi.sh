@@ -8,9 +8,6 @@
 
 source "$(dirname "$0")/lib.sh"
 
-COLOR_DOWN=$COLOR_OK
-COLOR_UP=$COLOR_ACCENT
-
 # The first two lines of /proc/net/wireless are headers.
 iface= link=
 {
@@ -48,8 +45,8 @@ fi
 echo "$iface $rx $tx $now" >"$state"
 
 # The block uses pango markup, so escape the connection name.
-name=${name//&/'&amp;'} name=${name//</'&lt;'} name=${name//>/'&gt;'}
-echo "${name} ${quality}% <span color='$COLOR_DOWN'>↓</span>$(human "$down") <span color='$COLOR_UP'>↑</span>$(human "$up")"
+name=$(escape "$name")
+echo "${name} ${quality}% <span color='$COLOR_OK'>↓</span>$(human "$down") <span color='$COLOR_ACCENT'>↑</span>$(human "$up")"
 echo "${quality}%"
 if ((quality >= 60)); then
   echo "#fff2cc"

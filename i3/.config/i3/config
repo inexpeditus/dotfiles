@@ -1,7 +1,7 @@
 # Roy i3
 
-gaps inner 1
-gaps outer 1
+gaps inner 2
+gaps outer 6
 set $mod Mod4
 
 # Title bar font. Pango falls back to other fonts for symbols this one lacks.
@@ -158,7 +158,8 @@ assign [class="KeePassXC"] workspace $ws7
 
 bar {
   status_command i3blocks -c ~/.config/i3/blocks.conf
-  font pango:Terminess Nerd Font Propo 12
+  separator_symbol "|"
+  font pango:Terminess Nerd Font 12
   #font pango : monospace 16
     # colors {
     #    background #1d1f21  # Replace with your desired color
@@ -170,7 +171,7 @@ bar {
             background #000000
             statusline #FFF5E0
 
-            separator #ef8513
+            separator #888888
             focused_workspace #000000 #DF8320 #000000
             active_workspace  #000000 #000000 #000000
             inactive_workspace #000000 #000000 #ffffff

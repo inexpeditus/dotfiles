@@ -28,12 +28,13 @@ stats=$(virsh -c "$URI" domstats --list-running --cpu-total --balloon --vcpu 2>/
 declare -A prev_ns prev_t
 if [[ -r $state ]]; then
   while read -r name ns t; do
-    prev_ns[$name]=$ns prev_t[$name]=$t
+    [[ -n $name ]] && prev_ns[$name]=$ns prev_t[$name]=$t
   done <"$state"
 fi
 
 now=$(date +%s%N)
-full=() short=() saved=()
+sep=" <span color='$COLOR_DIM'>|</span> "
+full='' short='' saved=''
 while read -r name ns rss vcpus; do
   [[ -n $name ]] || continue
   # shellcheck disable=SC2254 # PATTERN is meant to be a glob
@@ -47,26 +48,19 @@ while read -r name ns rss vcpus; do
       ((cpu > 100)) && cpu=100
     fi
   fi
-  saved+=("$name $ns $now")
-  full+=("$name $cpu% $(human $((rss * 1024)))")
-  short+=("$name")
+  saved+="$name $ns $now"$'\n'
+  label=$(escape "$name")
+  full+="${full:+$sep}$label $cpu% $(human $((rss * 1024)))"
+  short+="${short:+, }$label"
 done <<<"$stats"
 
-if ((${#full[@]} == 0)); then
+if [[ -z $full ]]; then
   rm -f "$state"
   echo
   exit 0
 fi
-printf '%s\n' "${saved[@]}" >"$state"
+printf '%s' "$saved" >"$state"
 
-# join SEPARATOR ITEM...
-join() {
-  local sep=$1 out
-  shift
-  out=$(printf "%s$sep" "$@")
-  echo "${out%"$sep"}"
-}
-
-join "  " "${full[@]}"
-join ", " "${short[@]}"
+echo "$full"
+echo "$short"
 echo "$COLOR_VM"

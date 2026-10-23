@@ -26,14 +26,13 @@ if [[ $state == Discharging ]]; then
   fi
 fi
 
-# ⚡ charging, orange ⚡ draining (the same colour as upload in the wifi block),
-# = on the charger but not charging (full or held).
+# Orange while draining; = is on the charger but not charging.
 case $state in
 Charging) sign="⚡" ;;
 Discharging) sign="<span color='$COLOR_ACCENT'>⚡</span>" ;;
 *) sign="=" ;;
 esac
 
-echo "Battery: ${percent}% ${sign}"
+echo "BAT: ${percent}% ${sign}"
 echo "${percent}%${sign}"
 echo "$COLOR"
