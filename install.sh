@@ -71,8 +71,7 @@ install_system_files() {
   for f in "${files[@]}"; do
     sudo install -Dm644 "etc/$f" "/etc/$f"
   done
-  # TLP is off for now.
-  # sudo systemctl enable --now tlp
+  sudo systemctl enable --now tlp
 }
 
 if ! $link_only; then
