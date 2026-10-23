@@ -48,6 +48,17 @@ copy() {
 
 mkcd() { mkdir -p -- "$1" && cd -- "$1"; }
 
+# Spaces in file names to dots, " - " to "-", commas dropped; without
+# arguments, every file here with a space in its name.
+dots() {
+    (( $# )) || set -- *\ *
+    local f
+    for f; do
+        [ -e "$f" ] || continue
+        mv -nv -- "$f" "$(dirname -- "$f")/$(basename -- "$f" | sed -E 's/ *- */-/g; s/,//g; s/ +/./g; s/\.+/./g')"
+    done
+}
+
 extract() {
     [ -f "$1" ] || { echo "extract: '$1' is not a file" >&2; return 1; }
     case "$1" in
@@ -56,7 +67,7 @@ extract() {
         *.tar.xz|*.txz)   tar xJf "$1" ;;
         *.tar.zst)        tar --zstd -xf "$1" ;;
         *.tar)            tar xf "$1" ;;
-        *.zip)            unzip "$1" ;;
+        *.zip)            bsdtar -xf "$1" ;; # unzip ignores the UTF-8 name flag
         *.7z)             7z x "$1" ;;
         *.rar)            unrar x "$1" ;;
         *.gz)             gunzip "$1" ;;
