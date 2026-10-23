@@ -50,6 +50,7 @@ bindsym $mod+s layout stacking
 bindsym $mod+e layout toggle split
 bindsym $mod+Tab workspace next
 bindsym $mod+Shift+Tab workspace prev
+bindsym $mod+x bar mode toggle
 bindsym $mod+Shift+space floating toggle
 bindsym $mod+space focus mode_toggle
 
@@ -159,6 +160,8 @@ assign [class="KeePassXC"] workspace $ws7
 bar {
   status_command i3blocks -c ~/.config/i3/blocks.conf
   separator_symbol "|"
+  # Don't peek the hidden bar while $mod is held
+  modifier none
   font pango:Terminess Nerd Font 12
   #font pango : monospace 16
     # colors {
