@@ -50,7 +50,7 @@ while read -r name ns rss vcpus; do
   fi
   saved+="$name $ns $now"$'\n'
   label=$(escape "$name")
-  full+="${full:+$sep}$label $cpu% $(human $((rss * 1024)))"
+  full+="${full:+$sep}$label vCPU $cpu% RAM $(human $((rss * 1024)))"
   short+="${short:+, }$label"
 done <<<"$stats"
 
