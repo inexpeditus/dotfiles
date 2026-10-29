@@ -17,6 +17,12 @@ thickness = 0.1
 background = "#000000"
 foreground = "#f9e5b8"
 
+# Claude Code's dark-ansi theme draws your messages as bright white on bright
+# black; this flips them to black on the normal text color
+[colors.bright]
+black = "#f9e5b8"
+white = "#000000"
+
 # Cursor in the text color, whatever is under it
 [colors.cursor]
 cursor = "#f9e5b8"
