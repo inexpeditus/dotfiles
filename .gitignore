@@ -4,6 +4,7 @@ notes/
 wireplumber/
 kvm/
 firefox/
+claude/
 
 # Separate repository checked out inside this one
 libvert-agent-sandbox/
@@ -20,3 +21,4 @@ libvert-agent-sandbox/
 
 # archinstall config, may hold credentials
 user_configuration.json
+.glab
